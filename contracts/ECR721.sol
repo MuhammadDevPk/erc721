@@ -61,4 +61,8 @@ contract ERC721 {
         nextTokenIdToMint = 0;
         contractOwner = msg.sender;
     }
+
+    function balanceOf(address _owner) public view returns (uint256) {
+        return _balances[_owner];
+    }
 }
