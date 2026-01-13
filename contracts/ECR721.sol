@@ -27,6 +27,9 @@ contract ERC721 {
     // token id => token uri
     // Where is the NFT's image/data stored?
     // This links to a JSON file with the NFT's name, description, and image URL.
+    // uint256(TokenID) => string(URI (link to metadata))
+    // 0	                "ipfs://Qm123.../0.json"
+    // 1	                "ipfs://Qm123.../1.json"
     mapping(uint256 => string) internal _tokenURIs;
 
     event Transfer(
