@@ -18,4 +18,20 @@ contract ERC721 {
     mapping(address => mapping(address => bool)) internal _operatorApprovals;
     // token id => token uri
     mapping(uint256 => string) internal _tokenURIs;
+
+    event Transfer(
+        address indexed from,
+        address indexed to,
+        uint256 indexed _tokenId
+    );
+    event Approval(
+        address indexed owner,
+        address indexed approved,
+        uint256 indexed _tokenId
+    );
+    event ApprovalForAll(
+        address indexed owner,
+        address indexed operator,
+        bool _approved
+    );
 }
