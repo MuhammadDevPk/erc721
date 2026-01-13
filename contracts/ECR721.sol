@@ -9,8 +9,12 @@ contract ERC721 {
     address public contractOwner;
 
     // NFTs(token) id => owner
+    // Who owns which NFT?
+    // Usage: _owners[3] = Ali means "Ali owns NFT #3"ß
     mapping(uint256 => address) internal _owners;
     // owner => NFTs(token) count
+    // How many NFTs does each owner have?
+    // Usage: _balances[Ali] = 5 means "Ali has 5 NFTs"ß
     mapping(address => uint256) internal _balances;
     // token id => approved address(e.g openSea)
     // e.g Who can sell my specific NFT?
