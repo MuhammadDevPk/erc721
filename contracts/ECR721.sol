@@ -21,6 +21,8 @@ contract ERC721 {
     // Usage: _operatorApprovals[Ali][OpenSea] = true means "OpenSea can manage ALL of Ali's NFTs"
     mapping(address => mapping(address => bool)) internal _operatorApprovals;
     // token id => token uri
+    // Where is the NFT's image/data stored?
+    // This links to a JSON file with the NFT's name, description, and image URL.
     mapping(uint256 => string) internal _tokenURIs;
 
     event Transfer(
