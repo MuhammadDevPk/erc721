@@ -8,13 +8,17 @@ contract ERC721 {
     uint256 public nextTokenIdToMint;
     address public contractOwner;
 
-    // token id => owner
+    // NFTs(token) id => owner
     mapping(uint256 => address) internal _owners;
-    // owner => token count
+    // owner => NFTs(token) count
     mapping(address => uint256) internal _balances;
-    // token id => approved address
+    // token id => approved address(e.g openSea)
+    // e.g Who can sell my specific NFT?
+    // Imagine you want to let a marketplace (like OpenSea) sell your NFT #3:
     mapping(uint256 => address) internal _tokenApprovals;
     // owner => (operator => yes/no)
+    // e.g Who can manage ALL my NFTs?
+    // Usage: _operatorApprovals[Ali][OpenSea] = true means "OpenSea can manage ALL of Ali's NFTs"
     mapping(address => mapping(address => bool)) internal _operatorApprovals;
     // token id => token uri
     mapping(uint256 => string) internal _tokenURIs;
