@@ -54,4 +54,11 @@ contract ERC721 {
         address indexed operator,
         bool _approved
     );
+
+    constructor(string memory _name, string memory _symbol) {
+        name = _name;
+        symbol = _symbol;
+        nextTokenIdToMint = 0;
+        contractOwner = msg.sender;
+    }
 }
