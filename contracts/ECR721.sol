@@ -32,16 +32,23 @@ contract ERC721 {
     // 1	                "ipfs://Qm123.../1.json"
     mapping(uint256 => string) internal _tokenURIs;
 
+    //📢 "NFT #5 was transferred FROM 0xAli TO 0xSara"
+    // Usage: emit Transfer(0xAli, 0xSara, 5);
     event Transfer(
         address indexed from,
         address indexed to,
         uint256 indexed _tokenId
     );
+
+    //📢 "0xAli approved (0xSara or OpenSea) to sell/transfer NFT #5"
+    // Usage: emit Approval(0xAli, 0xOpenSea, 3);
     event Approval(
         address indexed owner,
         address indexed approved,
         uint256 indexed _tokenId
     );
+    //📢 "0xAli gave 0xOpenSea permission to manage ALL their NFTs"
+    // Usage: emit ApprovalForAll(0xAli, 0xOpenSea, true);
     event ApprovalForAll(
         address indexed owner,
         address indexed operator,
