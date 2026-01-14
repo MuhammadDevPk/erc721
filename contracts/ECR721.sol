@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import "./IERC721Receiver.sol";
+
 contract ERC721 {
     string public name; // e.g CryptoPunks
     string public symbol; // e.gϾ it's a short abbreviation of your collection name
@@ -68,5 +70,40 @@ contract ERC721 {
 
     function ownerOf(uint256 _tokenId) public view returns (address) {
         return _owners[_tokenId];
+    }
+
+    // INTERNAL FUNCTIONS
+    function _checkOnERC721Received(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) private returns (bool) {
+        // check if to is an contract, if yes then to.code.length will always > 0
+        if (to.code.length > 0) {
+            try
+                IERC721Receiver(to).onERC721Received(
+                    msg.sender,
+                    from,
+                    tokenId,
+                    data
+                )
+            returns (bytes4 retval) {
+                return retval == IERC721Receiver.onERC721Received.selector;
+            } catch (bytes memory reason) {
+                if (reason.length == 0) {
+                    revert(
+                        "ERC721: transfer to non ERC721Receiver implementer"
+                    );
+                } else {
+                    /// @solidity memory-safe-assembly
+                    assembly {
+                        revert(add(32, reason), mload(reason))
+                    }
+                }
+            }
+        } else {
+            return true;
+        }
     }
 }
