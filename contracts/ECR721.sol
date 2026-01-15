@@ -92,11 +92,13 @@ contract ERC721 {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
+                    // No error message - generic error
                     revert(
                         "ERC721: transfer to non ERC721Receiver implementer"
                     );
                 } else {
                     /// @solidity memory-safe-assembly
+                    // Has error message - forward it
                     assembly {
                         revert(add(32, reason), mload(reason))
                     }
@@ -105,5 +107,18 @@ contract ERC721 {
         } else {
             return true;
         }
+    }
+
+    // unsafe transfer
+    function _transfer(address _from, address _to, uint256 _tokenId) internal {
+        require(ownerOf(_tokenId) == _from, "!Owner");
+        require(_to != address(0), "!ToAdd0");
+
+        delete _tokenApprovals[_tokenId];
+        _balances[_from] -= 1;
+        _balances[_to] += 1;
+        _owners[_tokenId] = _to;
+
+        emit Transfer(_from, _to, _tokenId)
     }
 }
