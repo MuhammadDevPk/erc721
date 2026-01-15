@@ -72,6 +72,17 @@ contract ERC721 {
         return _owners[_tokenId];
     }
 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId) public payable {
+        safeTransferFrom(_from, _to, _tokenId, "");   
+    }
+
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes memory _data) public payable{
+        require(ownerOf(_tokenId) == msg.sender || _tokenApprovals[_tokenId] == msg.sender || _operatorApprovals[ownerOf(_tokenId)][msg.sender], "!Auth");
+        _transfer(_from, _to, _tokenId);
+        // trigger func check
+        require(_checkOnERC721Received(_from, _to, _tokenId, _data), "!ERC721Receiver");
+    }
+
     // INTERNAL FUNCTIONS
     function _checkOnERC721Received(
         address from,
