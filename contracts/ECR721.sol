@@ -80,6 +80,7 @@ contract ERC721 {
         require(ownerOf(_tokenId) == msg.sender || _tokenApprovals[_tokenId] == msg.sender || _operatorApprovals[ownerOf(_tokenId)][msg.sender], "!Auth");
         _transfer(_from, _to, _tokenId);
         // trigger func check
+        // Added Comemetn
         require(_checkOnERC721Received(_from, _to, _tokenId, _data), "!ERC721Receiver");
     }
 
