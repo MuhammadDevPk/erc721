@@ -83,6 +83,23 @@ contract ERC721 {
         require(_checkOnERC721Received(_from, _to, _tokenId, _data), "!ERC721Receiver");
     }
 
+    function transferFrom(address _from, address _to, uint256 _tokenId) public payable{
+        // unsafe transfer without onERC721Received check, used for contracts that don't implement onERC721Received
+        require(ownerOf(_tokenId) == msg.sender || _tokenApprovals[_tokenId] == msg.sender || _operatorApprovals[ownerOf(_tokenId)][msg.sender], "!Auth");
+        _transfer(_from, _to, _tokenId);
+    }
+
+    function approve(address _approved, uint256 _tokenId) public payable{
+        require(ownerOf(_tokenId) == msg.sender, "!Owner");
+        _tokenApprovals[_tokenId] = _approved;
+        emit Approval(ownerOf(_tokenId), _approved, _tokenId);
+    }
+
+    function setApprovalForAll(address _operator, bool _approved) public{
+        _operatorApprovals[msg.sender][_operator] = _approved;
+        emit ApprovalForAll(msg.sender, _operator, _approved);
+    }
+
     // INTERNAL FUNCTIONS
     function _checkOnERC721Received(
         address from,
