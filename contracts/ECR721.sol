@@ -100,6 +100,14 @@ contract ERC721 {
         emit ApprovalForAll(msg.sender, _operator, _approved);
     }
 
+    function getApproved(uint256 _tokenId) public view returns (address){
+        return _tokenApprovals[_tokenId];
+    }
+
+    function isApprovedForAll(address _owner, address _operator) public view returns (bool){
+        return _operatorApprovals[_owner][_operator];
+    }
+
     // INTERNAL FUNCTIONS
     function _checkOnERC721Received(
         address from,
