@@ -108,6 +108,15 @@ contract ERC721 {
         return _operatorApprovals[_owner][_operator];
     }
 
+    function mintTo(address _to, string memory _uri) public {
+        require(contractOwner == msg.sender, "!Auth");
+        _owners[nextTokenIdToMint] = _to;
+        _balances[_to] += 1;
+        _tokenURIs[nextTokenIdToMint] = _uri;
+        emit Transfer(address(0), _to, nextTokenIdToMint);
+        nextTokenIdToMint += 1;
+    }
+
     // INTERNAL FUNCTIONS
     function _checkOnERC721Received(
         address from,
