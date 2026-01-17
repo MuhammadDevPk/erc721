@@ -117,6 +117,14 @@ contract ERC721 {
         nextTokenIdToMint += 1;
     }
 
+    function tokenURI(uint256 _tokenId) public view returns (string memory){
+        return _tokenURIs[_tokenId];
+    }
+
+    function totalSupply() public view returns (uint256){
+        return nextTokenIdToMint;
+    }
+
     // INTERNAL FUNCTIONS
     function _checkOnERC721Received(
         address from,
