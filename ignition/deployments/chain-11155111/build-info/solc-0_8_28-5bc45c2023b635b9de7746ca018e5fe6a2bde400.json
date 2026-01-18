@@ -1,0 +1,42 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-5bc45c2023b635b9de7746ca018e5fe6a2bde400",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/ECR721.sol": "project/contracts/ECR721.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/ECR721.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.28;\n\nimport \"./IERC721Receiver.sol\";\n\ncontract ERC721 {\n    string public name; // e.g CryptoPunks\n    string public symbol; // e.gϾ it's a short abbreviation of your collection name\n\n    uint256 public nextTokenIdToMint;\n    address public contractOwner;\n\n    // NFTs(token) id => owner\n    // Who owns which NFT?\n    // Usage: _owners[3] = Ali means \"Ali owns NFT #3\"ß\n    mapping(uint256 => address) internal _owners;\n    // owner => NFTs(token) count\n    // How many NFTs does each owner have?\n    // Usage: _balances[Ali] = 5 means \"Ali has 5 NFTs\"ß\n    mapping(address => uint256) internal _balances;\n    // token id => approved address(e.g openSea)\n    // e.g Who can sell my specific NFT?\n    // Imagine you want to let a marketplace (like OpenSea) sell your NFT #3:\n    mapping(uint256 => address) internal _tokenApprovals;\n    // owner => (operator => yes/no)\n    // e.g Who can manage ALL my NFTs?\n    // Usage: _operatorApprovals[Ali][OpenSea] = true means \"OpenSea can manage ALL of Ali's NFTs\"\n    mapping(address => mapping(address => bool)) internal _operatorApprovals;\n    // token id => token uri\n    // Where is the NFT's image/data stored?\n    // This links to a JSON file with the NFT's name, description, and image URL.\n    // uint256(TokenID) => string(URI (link to metadata))\n    // 0\t                \"ipfs://Qm123.../0.json\"\n    // 1\t                \"ipfs://Qm123.../1.json\"\n    mapping(uint256 => string) internal _tokenURIs;\n\n    //📢 \"NFT #5 was transferred FROM 0xAli TO 0xSara\"\n    // Usage: emit Transfer(0xAli, 0xSara, 5);\n    event Transfer(\n        address indexed from,\n        address indexed to,\n        uint256 indexed _tokenId\n    );\n\n    //📢 \"0xAli approved (0xSara or OpenSea) to sell/transfer NFT #5\"\n    // Usage: emit Approval(0xAli, 0xOpenSea, 3);\n    event Approval(\n        address indexed owner,\n        address indexed approved,\n        uint256 indexed _tokenId\n    );\n    //📢 \"0xAli gave 0xOpenSea permission to manage ALL their NFTs\"\n    // Usage: emit ApprovalForAll(0xAli, 0xOpenSea, true);\n    event ApprovalForAll(\n        address indexed owner,\n        address indexed operator,\n        bool _approved\n    );\n\n    constructor(string memory _name, string memory _symbol) {\n        name = _name;\n        symbol = _symbol;\n        nextTokenIdToMint = 0;\n        contractOwner = msg.sender;\n    }\n\n    function balanceOf(address _owner) public view returns (uint256) {\n        return _balances[_owner];\n    }\n\n    function ownerOf(uint256 _tokenId) public view returns (address) {\n        return _owners[_tokenId];\n    }\n\n    function safeTransferFrom(\n        address _from,\n        address _to,\n        uint256 _tokenId\n    ) public payable {\n        safeTransferFrom(_from, _to, _tokenId, \"\");\n    }\n\n    function safeTransferFrom(\n        address _from,\n        address _to,\n        uint256 _tokenId,\n        bytes memory _data\n    ) public payable {\n        require(\n            ownerOf(_tokenId) == msg.sender ||\n                _tokenApprovals[_tokenId] == msg.sender ||\n                _operatorApprovals[ownerOf(_tokenId)][msg.sender],\n            \"!Auth\"\n        );\n        _transfer(_from, _to, _tokenId);\n        // trigger func check\n        require(\n            _checkOnERC721Received(_from, _to, _tokenId, _data),\n            \"!ERC721Receiver\"\n        );\n    }\n\n    function transferFrom(\n        address _from,\n        address _to,\n        uint256 _tokenId\n    ) public payable {\n        // unsafe transfer without onERC721Received check, used for contracts that don't implement onERC721Received\n        require(\n            ownerOf(_tokenId) == msg.sender ||\n                _tokenApprovals[_tokenId] == msg.sender ||\n                _operatorApprovals[ownerOf(_tokenId)][msg.sender],\n            \"!Auth\"\n        );\n        _transfer(_from, _to, _tokenId);\n    }\n\n    function approve(address _approved, uint256 _tokenId) public payable {\n        require(ownerOf(_tokenId) == msg.sender, \"!Owner\");\n        _tokenApprovals[_tokenId] = _approved;\n        emit Approval(ownerOf(_tokenId), _approved, _tokenId);\n    }\n\n    function setApprovalForAll(address _operator, bool _approved) public {\n        _operatorApprovals[msg.sender][_operator] = _approved;\n        emit ApprovalForAll(msg.sender, _operator, _approved);\n    }\n\n    function getApproved(uint256 _tokenId) public view returns (address) {\n        return _tokenApprovals[_tokenId];\n    }\n\n    function isApprovedForAll(\n        address _owner,\n        address _operator\n    ) public view returns (bool) {\n        return _operatorApprovals[_owner][_operator];\n    }\n\n    function mintTo(address _to, string memory _uri) public {\n        require(contractOwner == msg.sender, \"!Auth\");\n        _owners[nextTokenIdToMint] = _to;\n        _balances[_to] += 1;\n        _tokenURIs[nextTokenIdToMint] = _uri;\n        emit Transfer(address(0), _to, nextTokenIdToMint);\n        nextTokenIdToMint += 1;\n    }\n\n    function tokenURI(uint256 _tokenId) public view returns (string memory) {\n        return _tokenURIs[_tokenId];\n    }\n\n    function totalSupply() public view returns (uint256) {\n        return nextTokenIdToMint;\n    }\n\n    // INTERNAL FUNCTIONS\n    function _checkOnERC721Received(\n        address from,\n        address to,\n        uint256 tokenId,\n        bytes memory data\n    ) private returns (bool) {\n        // check if to is an contract, if yes then to.code.length will always > 0\n        if (to.code.length > 0) {\n            try\n                IERC721Receiver(to).onERC721Received(\n                    msg.sender,\n                    from,\n                    tokenId,\n                    data\n                )\n            returns (bytes4 retval) {\n                return retval == IERC721Receiver.onERC721Received.selector;\n            } catch (bytes memory reason) {\n                if (reason.length == 0) {\n                    // No error message - generic error\n                    revert(\n                        \"ERC721: transfer to non ERC721Receiver implementer\"\n                    );\n                } else {\n                    /// @solidity memory-safe-assembly\n                    // Has error message - forward it\n                    assembly {\n                        revert(add(32, reason), mload(reason))\n                    }\n                }\n            }\n        } else {\n            return true;\n        }\n    }\n\n    // unsafe transfer\n    function _transfer(address _from, address _to, uint256 _tokenId) internal {\n        require(ownerOf(_tokenId) == _from, \"!Owner\");\n        require(_to != address(0), \"!ToAdd0\");\n\n        delete _tokenApprovals[_tokenId];\n        _balances[_from] -= 1;\n        _balances[_to] += 1;\n        _owners[_tokenId] = _to;\n\n        emit Transfer(_from, _to, _tokenId);\n    }\n}\n"
+      },
+      "project/contracts/IERC721Receiver.sol": {
+        "content": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.28;\n\ninterface IERC721Receiver {\n    function onERC721Received(\n        address operator,\n        address from,\n        uint256 tokenId,\n        bytes calldata data\n    ) external returns (bytes4);\n}\n"
+      }
+    }
+  }
+}
