@@ -72,68 +72,39 @@ contract ERC721 {
         return _owners[_tokenId];
     }
 
-    function safeTransferFrom(
-        address _from,
-        address _to,
-        uint256 _tokenId
-    ) public payable {
-        safeTransferFrom(_from, _to, _tokenId, "");
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId) public payable {
+        safeTransferFrom(_from, _to, _tokenId, "");   
     }
 
-    function safeTransferFrom(
-        address _from,
-        address _to,
-        uint256 _tokenId,
-        bytes memory _data
-    ) public payable {
-        require(
-            ownerOf(_tokenId) == msg.sender ||
-                _tokenApprovals[_tokenId] == msg.sender ||
-                _operatorApprovals[ownerOf(_tokenId)][msg.sender],
-            "!Auth"
-        );
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes memory _data) public payable{
+        require(ownerOf(_tokenId) == msg.sender || _tokenApprovals[_tokenId] == msg.sender || _operatorApprovals[ownerOf(_tokenId)][msg.sender], "!Auth");
         _transfer(_from, _to, _tokenId);
         // trigger func check
-        require(
-            _checkOnERC721Received(_from, _to, _tokenId, _data),
-            "!ERC721Receiver"
-        );
+        require(_checkOnERC721Received(_from, _to, _tokenId, _data), "!ERC721Receiver");
     }
 
-    function transferFrom(
-        address _from,
-        address _to,
-        uint256 _tokenId
-    ) public payable {
+    function transferFrom(address _from, address _to, uint256 _tokenId) public payable{
         // unsafe transfer without onERC721Received check, used for contracts that don't implement onERC721Received
-        require(
-            ownerOf(_tokenId) == msg.sender ||
-                _tokenApprovals[_tokenId] == msg.sender ||
-                _operatorApprovals[ownerOf(_tokenId)][msg.sender],
-            "!Auth"
-        );
+        require(ownerOf(_tokenId) == msg.sender || _tokenApprovals[_tokenId] == msg.sender || _operatorApprovals[ownerOf(_tokenId)][msg.sender], "!Auth");
         _transfer(_from, _to, _tokenId);
     }
 
-    function approve(address _approved, uint256 _tokenId) public payable {
+    function approve(address _approved, uint256 _tokenId) public payable{
         require(ownerOf(_tokenId) == msg.sender, "!Owner");
         _tokenApprovals[_tokenId] = _approved;
         emit Approval(ownerOf(_tokenId), _approved, _tokenId);
     }
 
-    function setApprovalForAll(address _operator, bool _approved) public {
+    function setApprovalForAll(address _operator, bool _approved) public{
         _operatorApprovals[msg.sender][_operator] = _approved;
         emit ApprovalForAll(msg.sender, _operator, _approved);
     }
 
-    function getApproved(uint256 _tokenId) public view returns (address) {
+    function getApproved(uint256 _tokenId) public view returns (address){
         return _tokenApprovals[_tokenId];
     }
 
-    function isApprovedForAll(
-        address _owner,
-        address _operator
-    ) public view returns (bool) {
+    function isApprovedForAll(address _owner, address _operator) public view returns (bool){
         return _operatorApprovals[_owner][_operator];
     }
 
@@ -146,11 +117,11 @@ contract ERC721 {
         nextTokenIdToMint += 1;
     }
 
-    function tokenURI(uint256 _tokenId) public view returns (string memory) {
+    function tokenURI(uint256 _tokenId) public view returns (string memory){
         return _tokenURIs[_tokenId];
     }
 
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public view returns (uint256){
         return nextTokenIdToMint;
     }
 
@@ -201,6 +172,6 @@ contract ERC721 {
         _balances[_to] += 1;
         _owners[_tokenId] = _to;
 
-        emit Transfer(_from, _to, _tokenId);
+        emit Transfer(_from, _to, _tokenId)
     }
 }
